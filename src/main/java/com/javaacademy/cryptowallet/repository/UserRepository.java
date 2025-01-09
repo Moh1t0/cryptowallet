@@ -1,20 +1,36 @@
 package com.javaacademy.cryptowallet.repository;
 
-import com.javaacademy.cryptowallet.database.UserDatabase;
 import com.javaacademy.cryptowallet.entity.UserEntity;
-import org.springframework.stereotype.Component;
-
+import com.javaacademy.cryptowallet.storage.UserStorageImpl;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-@Component
+@Repository
+@RequiredArgsConstructor
+@Data
 public class UserRepository {
-    private UserDatabase userDatabase;
+    private final UserStorageImpl userStorage;
 
-    public void save(UserEntity userEntity) {
-        userDatabase.save(userEntity);
+    public List<UserEntity> findAll() {
+        return new ArrayList<>(userStorage.getData().values());
     }
 
-    public Optional<UserEntity> getByLogin(String login) {
-        return userDatabase.getByLogin(login);
+    public void save(UserEntity userEntity) {
+        if (userStorage.getData().containsKey(userEntity.getLogin())) {
+            throw new IllegalArgumentException("Пользователь с таким логином уже есть!");
+        }
+        userStorage.getData().put(userEntity.getLogin(), userEntity);
+    }
+
+    public Optional<UserEntity> findByLogin(String login) {
+        return Optional.ofNullable(userStorage.getData().get(login));
+    }
+
+    public void update(UserEntity userEntity) {
+        userStorage.getData().put(userEntity.getLogin(), userEntity);
     }
 }

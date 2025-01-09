@@ -1,0 +1,6 @@
+app:
+  converter:
+    crypto:
+    local-value: 10000
+  usd:
+    fixedRate: 100
